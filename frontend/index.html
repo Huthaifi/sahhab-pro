@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>سحّاب Pro — محمّل الوسائط الاحترافي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+/* ──────────────────────── Variables ──────────────────────── */
+:root{
+  --bg:       #080b14;
+  --surface:  #0e1220;
+  --card:     #141927;
+  --card2:    #1a2035;
+  --border:   #232b40;
+  --border2:  #2a3450;
+  --cyan:     #00e5ff;
+  --cyan2:    #00b4cc;
+  --purple:   #7c3aed;
+  --purple2:  #5b21b6;
+  --green:    #10d47a;
+  --red:      #ff4d6d;
+  --yellow:   #fbbf24;
+  --text:     #e2e8f0;
+  --text2:    #94a3b8;
+  --text3:    #475569;
+  --mono:     'JetBrains Mono', monospace;
+  --font:     'Tajawal', sans-serif;
+  --radius:   12px;
+  --radius2:  8px;
+  --shadow:   0 4px 24px rgba(0,0,0,.5);
+  --glow:     0 0 24px rgba(0,229,255,.15);
+}
+
+/* ──────────────────────── Reset ──────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  font-size:15px;
+}
+
+/* ──────────────────────── Background ──────────────────────── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,180,204,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(124,58,237,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 60% 30%, rgba(0,229,255,.03) 0%, transparent 50%);
+  pointer-events:none;z-index:0;
+}
+
+/* Grid pattern */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;z-index:0;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+
+#app{position:relative;z-index:1;}
+
+/* ──────────────────────── Header ──────────────────────── */
+header{
+  padding:20px 24px 0;
+  display:flex;align-items:center;justify-content:space-between;
+  max-width:1100px;margin:0 auto;
+}
+.logo{
+  display:flex;align-items:center;gap:12px;
+}
+.logo-icon{
+  width:44px;height:44px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  box-shadow:0 0 20px rgba(0,229,255,.3);
+  flex-shrink:0;
+}
+.logo-text{
+  display:flex;flex-direction:column;
+}
+.logo-name{
+  font-size:22px;font-weight:900;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  letter-spacing:-.5px;
+}
+.logo-sub{font-size:11px;color:var(--text3);font-weight:400;margin-top:1px;}
+
+.conn-status{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--text3);
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;padding:6px 12px;
+}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);transition:.3s;}
+.conn-dot.ok{background:var(--green);box-shadow:0 0 8px var(--green);}
+.conn-dot.err{background:var(--red);}
+
+/* ──────────────────────── Hero ──────────────────────── */
+.hero{
+  text-align:center;padding:40px 24px 0;
+  max-width:700px;margin:0 auto;
+}
+.hero h1{
+  font-size:clamp(26px,5vw,42px);
+  font-weight:900;
+  line-height:1.2;
+  background:linear-gradient(160deg,#fff 30%,var(--cyan) 70%,var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:10px;
+}
+.hero p{font-size:15px;color:var(--text2);line-height:1.7;}
+
+/* Platform badges */
+.platforms{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:8px;
+  margin:20px 0 0;
+}
+.platform-badge{
+  display:flex;align-items:center;gap:5px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:5px 12px;
+  font-size:12px;color:var(--text2);
+  transition:.2s;cursor:default;
+}
+.platform-badge:hover{border-color:var(--cyan);color:var(--cyan);}
+.platform-badge span{font-size:15px;}
+
+/* ──────────────────────── Tabs ──────────────────────── */
+.tabs-wrap{
+  max-width:1100px;margin:30px auto 0;
+  padding:0 16px;
+}
+.tabs{
+  display:flex;gap:4px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:4px;
+  overflow-x:auto;
+}
+.tab-btn{
+  flex:1;min-width:110px;
+  background:transparent;border:none;
+  color:var(--text2);
+  font-family:var(--font);font-size:13px;font-weight:600;
+  padding:10px 14px;
+  border-radius:var(--radius2);
+  cursor:pointer;transition:.2s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  white-space:nowrap;
+}
+.tab-btn:hover{background:var(--card);color:var(--text);}
+.tab-btn.active{
+  background:linear-gradient(135deg,rgba(0,229,255,.15),rgba(124,58,237,.15));
+  color:var(--cyan);
+  border:1px solid rgba(0,229,255,.2);
+}
+.tab-btn .badge{
+  background:var(--cyan);color:#000;
+  font-size:10px;font-weight:700;
+  border-radius:10px;padding:1px 6px;
+  min-width:18px;text-align:center;
+}
+
+/* ──────────────────────── Tab content ──────────────────────── */
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.tab-panel{
+  max-width:1100px;margin:16px auto;
+  padding:0 16px 40px;
+}
+
+/* ──────────────────────── Cards ──────────────────────── */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:16px;
+}
+.card-title{
+  font-size:13px;font-weight:700;
+  color:var(--text2);
+  text-transform:uppercase;letter-spacing:.5px;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-title::before{
+  content:'';
+  width:3px;height:14px;
+  background:linear-gradient(var(--cyan),var(--purple));
+  border-radius:2px;
+}
+
+/* ──────────────────────── Input groups ──────────────────────── */
+.input-group{display:flex;gap:10px;align-items:stretch;}
+.input-wrap{flex:1;position:relative;}
+.input-wrap .prefix-icon{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  color:var(--text3);font-size:16px;pointer-events:none;
+}
+input[type=text],input[type=password],textarea,select{
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-family:var(--font);font-size:14px;
+  border-radius:var(--radius2);
+  padding:12px 14px;
+  outline:none;
+  transition:.2s;
+  direction:ltr;
+}
+input[type=text]:focus,input[type=password]:focus,textarea:focus,select:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 3px rgba(0,229,255,.1);
+}
+input::placeholder,textarea::placeholder{color:var(--text3);}
+textarea{resize:vertical;min-height:100px;direction:ltr;}
+select{cursor:pointer;}
+select option{background:var(--surface);}
+
+.has-icon input{padding-right:42px;}
+
+/* ──────────────────────── Buttons ──────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  font-family:var(--font);font-size:13px;font-weight:700;
+  border:none;border-radius:var(--radius2);
+  cursor:pointer;transition:.2s;white-space:nowrap;
+  padding:12px 20px;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--cyan),var(--cyan2));
+  color:#000;
+  box-shadow:0 4px 16px rgba(0,229,255,.3);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,229,255,.4);}
+.btn-primary:active{transform:translateY(0);}
+.btn-secondary{
+  background:var(--card2);border:1px solid var(--border2);
+  color:var(--text);
+}
+.btn-secondary:hover{border-color:var(--cyan);color:var(--cyan);}
+.btn-purple{
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  color:#fff;
+  box-shadow:0 4px 16px rgba(124,58,237,.3);
+}
+.btn-purple:hover{transform:translateY(-1px);}
+.btn-danger{background:rgba(255,77,109,.15);border:1px solid rgba(255,77,109,.3);color:var(--red);}
+.btn-danger:hover{background:rgba(255,77,109,.25);}
+.btn-sm{padding:7px 12px;font-size:12px;}
+.btn-icon{padding:8px;border-radius:var(--radius2);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;}
+
+/* ──────────────────────── Quality selector ──────────────────────── */
+.quality-row{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;
+}
+.quality-chip{
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text2);
+  font-family:var(--font);font-size:12px;font-weight:600;
+  padding:6px 14px;border-radius:20px;
+  cursor:pointer;transition:.2s;
+}
+.quality-chip:hover{border-color:var(--cyan2);color:var(--cyan);}
+.quality-chip.active{
+  background:rgba(0,229,255,.1);
+  border-color:var(--cyan);
+  color:var(--cyan);
+}
+
+/* ──────────────────────── Toggle ──────────────────────── */
+.toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;
+  border-top:1px solid var(--border);
+  margin-top:14px;
+}
+.toggle-label{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:8px;}
+.toggle{
+  position:relative;width:40px;height:22px;cursor:pointer;
+}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{
+  position:absolute;inset:0;
+  background:var(--border2);border-radius:22px;transition:.3s;
+}
+.toggle-slider::after{
+  content:'';position:absolute;
+  width:16px;height:16px;background:#fff;
+  border-radius:50%;
+  top:3px;right:3px;
+  transition:.3s;
+}
+.toggle input:checked + .toggle-slider{background:var(--cyan);}
+.toggle input:checked + .toggle-slider::after{transform:translateX(-18px);}
+
+/* ──────────────────────── Job cards ──────────────────────── */
+.job-list{display:flex;flex-direction:column;gap:10px;}
+.job-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;
+  transition:.2s;
+}
+.job-card:hover{border-color:var(--border2);}
+.job-card.status-downloading{border-left:3px solid var(--cyan);}
+.job-card.status-queued{border-left:3px solid var(--yellow);}
+.job-card.status-completed{border-left:3px solid var(--green);}
+.job-card.status-failed{border-left:3px solid var(--red);}
+.job-card.status-sending_telegram{border-left:3px solid var(--purple);}
+
+.job-thumb{
+  width:52px;height:52px;object-fit:cover;
+  border-radius:var(--radius2);background:var(--surface);
+  flex-shrink:0;
+}
+.job-thumb-placeholder{
+  width:52px;height:52px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.job-info{min-width:0;}
+.job-title{
+  font-size:13px;font-weight:600;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  margin-bottom:4px;
+}
+.job-url{
+  font-size:11px;color:var(--text3);
+  font-family:var(--mono);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  margin-bottom:6px;direction:ltr;text-align:left;
+}
+.job-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.status-pill{
+  font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:10px;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.status-pill.queued{background:rgba(251,191,36,.15);color:var(--yellow);}
+.status-pill.downloading{background:rgba(0,229,255,.15);color:var(--cyan);}
+.status-pill.completed{background:rgba(16,212,122,.15);color:var(--green);}
+.status-pill.failed{background:rgba(255,77,109,.15);color:var(--red);}
+.status-pill.sending_telegram{background:rgba(124,58,237,.2);color:#a78bfa;}
+.status-pill.cancelled{background:rgba(100,116,139,.15);color:var(--text3);}
+.progress-wrap{margin-top:4px;}
+.progress-bar{
+  height:3px;background:var(--border);border-radius:2px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  border-radius:2px;transition:width .3s;
+}
+.progress-label{font-size:10px;color:var(--text3);margin-top:3px;}
+.job-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+
+/* ──────────────────────── Profile results ──────────────────────── */
+.profile-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:12px;margin-top:16px;
+}
+.video-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+  cursor:pointer;transition:.2s;
+  position:relative;
+}
+.video-card:hover{border-color:var(--cyan);transform:translateY(-2px);}
+.video-card.selected{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 2px rgba(0,229,255,.2);
+}
+.video-card .check{
+  position:absolute;top:8px;right:8px;
+  width:20px;height:20px;
+  background:var(--cyan);
+  border-radius:50%;
+  display:none;align-items:center;justify-content:center;
+  font-size:11px;color:#000;font-weight:700;z-index:2;
+}
+.video-card.selected .check{display:flex;}
+.video-thumb{
+  width:100%;aspect-ratio:16/9;
+  object-fit:cover;background:var(--surface);
+}
+.video-thumb-placeholder{
+  width:100%;aspect-ratio:16/9;
+  background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;
+}
+.video-info{padding:8px 10px;}
+.video-title{
+  font-size:12px;font-weight:600;
+  color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;line-height:1.4;margin-bottom:4px;
+}
+.video-dur{font-size:10px;color:var(--text3);}
+
+/* ──────────────────────── Telegram section ──────────────────────── */
+.tg-verified{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(16,212,122,.1);border:1px solid rgba(16,212,122,.2);
+  border-radius:var(--radius2);padding:10px 14px;
+  margin-top:10px;font-size:13px;
+}
+.tg-verified .icon{font-size:18px;}
+.tg-verified b{color:var(--green);}
+
+/* ──────────────────────── Empty state ──────────────────────── */
+.empty-state{
+  text-align:center;padding:48px 20px;
+  color:var(--text3);
+}
+.empty-state .icon{font-size:48px;margin-bottom:12px;opacity:.5;}
+.empty-state p{font-size:14px;}
+
+/* ──────────────────────── Notifications ──────────────────────── */
+#notifications{
+  position:fixed;bottom:20px;left:20px;
+  display:flex;flex-direction:column;gap:8px;
+  z-index:9999;max-width:340px;
+}
+.notif{
+  background:var(--card2);border:1px solid var(--border2);
+  border-radius:var(--radius2);padding:12px 14px;
+  font-size:13px;
+  display:flex;align-items:center;gap:10px;
+  animation:slideIn .3s ease;
+  box-shadow:var(--shadow);
+}
+.notif.success{border-color:rgba(16,212,122,.3);color:var(--green);}
+.notif.error{border-color:rgba(255,77,109,.3);color:var(--red);}
+.notif.info{border-color:rgba(0,229,255,.2);color:var(--cyan);}
+@keyframes slideIn{from{transform:translateX(-20px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ──────────────────────── Stats bar ──────────────────────── */
+.stats-bar{
+  display:flex;gap:16px;flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.stat-chip{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius2);padding:8px 14px;
+  font-size:12px;color:var(--text2);
+  display:flex;align-items:center;gap:6px;
+}
+.stat-chip strong{color:var(--text);font-size:15px;}
+
+/* ──────────────────────── Section title ──────────────────────── */
+.section-title{
+  font-size:18px;font-weight:700;
+  color:var(--text);margin-bottom:6px;
+}
+.section-sub{font-size:13px;color:var(--text2);margin-bottom:16px;}
+
+/* ──────────────────────── Bulk textarea ──────────────────────── */
+.bulk-hint{font-size:11px;color:var(--text3);margin-top:6px;}
+
+/* ──────────────────────── Divider ──────────────────────── */
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
+
+/* ──────────────────────── Spinner ──────────────────────── */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{
+  width:16px;height:16px;border-radius:50%;
+  border:2px solid transparent;
+  border-top-color:currentColor;
+  animation:spin .7s linear infinite;
+}
+
+/* ──────────────────────── Scrollbar ──────────────────────── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* ──────────────────────── Responsive ──────────────────────── */
+@media(max-width:600px){
+  header{padding:14px 12px 0;}
+  .hero{padding:24px 12px 0;}
+  .hero h1{font-size:24px;}
+  .tab-panel{padding:0 12px 30px;}
+  .job-card{grid-template-columns:44px 1fr auto;}
+  .job-thumb,.job-thumb-placeholder{width:44px;height:44px;}
+  .profile-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
+  .input-group{flex-direction:column;}
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<!-- ─── Header ─── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">
+      <div class="logo-name">سحّاب Pro</div>
+      <div class="logo-sub">محمّل الوسائط الاحترافي</div>
+    </div>
+  </div>
+  <div class="conn-status" id="connStatus">
+    <div class="conn-dot" id="connDot"></div>
+    <span id="connLabel">جاري الاتصال…</span>
+  </div>
+</header>
+
+<!-- ─── Hero ─── -->
+<div class="hero">
+  <h1>حمّل من أي منصة بنقرة واحدة</h1>
+  <p>يوتيوب، تيك توك، إنستغرام، سناب شات، تويتر وأكثر من ألف موقع</p>
+  <div class="platforms">
+    <div class="platform-badge"><span>▶</span> يوتيوب</div>
+    <div class="platform-badge"><span>🎵</span> تيك توك</div>
+    <div class="platform-badge"><span>📸</span> إنستغرام</div>
+    <div class="platform-badge"><span>👻</span> سناب شات</div>
+    <div class="platform-badge"><span>🐦</span> تويتر/X</div>
+    <div class="platform-badge"><span>📘</span> فيسبوك</div>
+    <div class="platform-badge"><span>✈️</span> تيليجرام</div>
+    <div class="platform-badge"><span>+1000</span> موقع</div>
+  </div>
+</div>
+
+<!-- ─── Tabs ─── -->
+<div class="tabs-wrap">
+  <div class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="single">⚡ تحميل سريع</button>
+    <button class="tab-btn" data-tab="bulk">📋 روابط متعددة</button>
+    <button class="tab-btn" data-tab="profile">👤 حساب كامل</button>
+    <button class="tab-btn" data-tab="queue">
+      ⏳ قائمة الانتظار
+      <span class="badge" id="queueBadge" style="display:none">0</span>
+    </button>
+    <button class="tab-btn" data-tab="telegram">✈️ تيليجرام</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ TAB: Single Download ═══════════════════ -->
+<div class="tab-content active" id="tab-single">
+  <div class="tab-panel">
+    <div class="card">
+      <div class="card-title">رابط التحميل</div>
+      <div class="input-group">
+        <div class="input-wrap has-icon">
+          <span class="prefix-icon">🔗</span>
+          <input type="text" id="singleUrl" placeholder="https://www.youtube.com/watch?v=...  أو  https://www.tiktok.com/..."/>
+        </div>
+        <button class="btn btn-primary" id="singleBtn" onclick="addSingleDownload()">
+          <span>⚡</span> تحميل
+        </button>
+      </div>
+
+      <div class="quality-row" id="qualityRow">
+        <span style="font-size:12px;color:var(--text3);align-self:center;">الجودة:</span>
+        <label class="quality-chip active" data-q="best">أفضل جودة</label>
+        <label class="quality-chip" data-q="1080p">1080p</label>
+        <label class="quality-chip" data-q="720p">720p</label>
+        <label class="quality-chip" data-q="480p">480p</label>
+        <label class="quality-chip" data-q="360p">360p</label>
+        <label class="quality-chip" data-q="audio">🎵 صوت فقط</label>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">
+          ✈️ أرسل مباشرة إلى تيليجرام (بدون تحميل على جهازك)
+        </span>
+        <label class="toggle">
+          <input type="checkbox" id="singleTg" onchange="toggleSingleTgPanel()"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div id="singleTgPanel" style="display:none;margin-top:10px;">
+        <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:var(--radius2);padding:12px;">
+          <p style="font-size:12px;color:#a78bfa;margin-bottom:10px;">
+            ✈️ سيقوم السيرفر بتحميل الفيديو وإرساله مباشرة لتيليجرام — دون استهلاك إنترنتك
+          </p>
+          <div style="display:flex;gap:8px;flex-direction:column;">
+            <input type="text" id="singleTgToken" placeholder="Bot Token: 1234567890:AAG..." style="font-family:var(--mono);font-size:12px;"/>
+            <input type="text" id="singleTgChat" placeholder="Chat ID أو @channel_username"/>
+          </div>
+          <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="loadSavedTgSettings()">
+            📂 استخدم الإعدادات المحفوظة
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TAB: Bulk Download ═══════════════════ -->
+<div class="tab-content" id="tab-bulk">
+  <div class="tab-panel">
+    <div class="card">
+      <div class="card-title">روابط متعددة</div>
+      <p class="section-sub">ضع كل رابط في سطر منفصل (حتى 50 رابط دفعة واحدة)</p>
+      <textarea id="bulkUrls" placeholder="https://www.youtube.com/watch?v=xxx&#10;https://www.tiktok.com/@user/video/yyy&#10;https://www.instagram.com/p/zzz/"></textarea>
+      <div class="bulk-hint" id="bulkCount">0 رابط</div>
+
+      <div class="quality-row" style="margin-top:14px;">
+        <span style="font-size:12px;color:var(--text3);align-self:center;">الجودة:</span>
+        <label class="quality-chip active" data-q="best">أفضل جودة</label>
+        <label class="quality-chip" data-q="720p">720p</label>
+        <label class="quality-chip" data-q="480p">480p</label>
+        <label class="quality-chip" data-q="audio">🎵 صوت فقط</label>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">✈️ أرسل إلى تيليجرام مباشرة</span>
+        <label class="toggle">
+          <input type="checkbox" id="bulkTg"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="addBulkDownloads()">
+          <span>⚡</span> إضافة الكل لقائمة التحميل
+        </button>
+        <button class="btn btn-secondary" onclick="clearBulk()">🗑️ مسح</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TAB: Profile ═══════════════════ -->
+<div class="tab-content" id="tab-profile">
+  <div class="tab-panel">
+    <div class="card">
+      <div class="card-title">جلب فيديوهات حساب</div>
+      <p class="section-sub">أدخل رابط قناة يوتيوب، أو حساب تيك توك، أو حساب إنستغرام</p>
+      <div class="input-group">
+        <div class="input-wrap has-icon">
+          <span class="prefix-icon">👤</span>
+          <input type="text" id="profileUrl" placeholder="https://www.youtube.com/@channelname  أو  @tiktokuser"/>
+        </div>
+        <div class="input-wrap" style="max-width:100px;">
+          <select id="profileMax">
+            <option value="20">20 فيديو</option>
+            <option value="50" selected>50 فيديو</option>
+            <option value="100">100 فيديو</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="fetchProfile()">
+          <span>🔍</span> جلب
+        </button>
+      </div>
+    </div>
+
+    <div id="profileResults" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div class="section-title" id="profileTitle">نتائج الحساب</div>
+          <div style="font-size:12px;color:var(--text3)" id="profileSubtitle"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="selectAllVideos()">✅ تحديد الكل</button>
+          <button class="btn btn-secondary btn-sm" onclick="deselectAll()">⬜ إلغاء الكل</button>
+          <button class="btn btn-primary btn-sm" onclick="downloadSelected()">
+            ⚡ تحميل المحدد
+            <span id="selectedCount">(0)</span>
+          </button>
+        </div>
+      </div>
+      <div class="profile-grid" id="profileGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TAB: Queue ═══════════════════ -->
+<div class="tab-content" id="tab-queue">
+  <div class="tab-panel">
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-chip"><strong id="s-total">0</strong> إجمالي</div>
+      <div class="stat-chip" style="color:var(--cyan)"><strong id="s-active">0</strong> جاري</div>
+      <div class="stat-chip" style="color:var(--green)"><strong id="s-done">0</strong> مكتمل</div>
+      <div class="stat-chip" style="color:var(--red)"><strong id="s-failed">0</strong> فشل</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <button class="btn btn-secondary btn-sm" onclick="refreshQueue()">🔄 تحديث</button>
+      <button class="btn btn-danger btn-sm" onclick="clearDone()">🗑️ حذف المكتملة</button>
+    </div>
+
+    <div id="jobList" class="job-list">
+      <div class="empty-state">
+        <div class="icon">📭</div>
+        <p>لا توجد مهام بعد<br/>أضف روابط للتحميل</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TAB: Telegram ═══════════════════ -->
+<div class="tab-content" id="tab-telegram">
+  <div class="tab-panel">
+    <div class="card">
+      <div class="card-title">إعدادات بوت تيليجرام</div>
+      <p class="section-sub">
+        اربط بوت تيليجرام لإرسال الفيديوهات مباشرة إلى قناتك أو محادثتك
+        دون تحميل أي شيء على جهازك — السيرفر يرسل مباشرة.
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <label style="font-size:12px;color:var(--text2);margin-bottom:5px;display:block;">
+            🤖 توكن البوت (Bot Token)
+          </label>
+          <div style="display:flex;gap:8px;">
+            <input type="password" id="tgToken" placeholder="123456789:AAG_xxxxxxxyyyyyyy" style="flex:1;font-family:var(--mono);font-size:12px;"/>
+            <button class="btn btn-secondary btn-sm" onclick="toggleTokenVis()" id="tokenVisBtn">👁</button>
+          </div>
+          <p style="font-size:11px;color:var(--text3);margin-top:5px;">
+            أنشئ بوت عبر <b style="color:var(--cyan)">@BotFather</b> واحصل على التوكن
+          </p>
+        </div>
+
+        <div>
+          <label style="font-size:12px;color:var(--text2);margin-bottom:5px;display:block;">
+            💬 Chat ID أو اسم القناة
+          </label>
+          <input type="text" id="tgChat" placeholder="@my_channel  أو  -1001234567890  أو  123456789"/>
+          <p style="font-size:11px;color:var(--text3);margin-top:5px;">
+            للقنوات: اكتب <b>@اسم_القناة</b> | للمجموعات والمحادثات: استخدم الـ ID الرقمي
+          </p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+        <button class="btn btn-purple" onclick="verifyTelegram()">
+          <span>✅</span> تحقق من البوت
+        </button>
+        <button class="btn btn-primary" onclick="saveTgSettings()">
+          <span>💾</span> حفظ الإعدادات
+        </button>
+      </div>
+
+      <div id="tgVerifyResult"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">كيفية الإعداد</div>
+      <ol style="padding-right:18px;display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--text2);line-height:1.7;">
+        <li>افتح تيليجرام وابحث عن <b style="color:var(--cyan)">@BotFather</b></li>
+        <li>أرسل <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">/newbot</code> وأتبع التعليمات</li>
+        <li>انسخ التوكن الذي يظهر لك وضعه في الحقل أعلاه</li>
+        <li>لإرسال لقناة: أضف البوت كـ <b>مسؤول</b> في القناة مع صلاحية "نشر الرسائل"</li>
+        <li>لمعرفة Chat ID: استخدم <b style="color:var(--cyan)">@userinfobot</b> أو <b style="color:var(--cyan)">@RawDataBot</b></li>
+        <li>احفظ الإعدادات وابدأ التحميل والإرسال التلقائي! 🚀</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Notifications ─── -->
+<div id="notifications"></div>
+
+</div><!-- #app -->
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   CONFIG — change API_BASE after deploying backend
+   ═══════════════════════════════════════════════════════ */
+const API_BASE = localStorage.getItem('sahhab_api') || 'http://localhost:8000';
+const WS_BASE  = API_BASE.replace(/^http/, 'ws');
+
+/* ═══════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════ */
+let jobs       = {};
+let ws         = null;
+let wsRetry    = 0;
+let activeTab  = 'single';
+let selQuality = 'best';
+let bulkQuality= 'best';
+let profileVideos = [];
+let selectedVideoUrls = new Set();
+
+/* ═══════════════════════════════════════════════════════
+   TABS
+   ═══════════════════════════════════════════════════════ */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+tab).classList.add('active');
+    activeTab = tab;
+    if(tab === 'queue') renderQueue();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════
+   QUALITY CHIPS
+   ═══════════════════════════════════════════════════════ */
+document.querySelectorAll('#tab-single .quality-chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('#tab-single .quality-chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    selQuality = c.dataset.q;
+  });
+});
+document.querySelectorAll('#tab-bulk .quality-chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('#tab-bulk .quality-chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    bulkQuality = c.dataset.q;
+  });
+});
+
+/* ═══════════════════════════════════════════════════════
+   BULK URL COUNTER
+   ═══════════════════════════════════════════════════════ */
+document.getElementById('bulkUrls').addEventListener('input', function(){
+  const lines = this.value.split('\n').filter(l => l.trim());
+  document.getElementById('bulkCount').textContent = lines.length + ' رابط';
+});
+
+/* ═══════════════════════════════════════════════════════
+   WEBSOCKET
+   ═══════════════════════════════════════════════════════ */
+function connectWS(){
+  const clientId = 'client_' + Math.random().toString(36).slice(2,8);
+  ws = new WebSocket(`${WS_BASE}/ws/${clientId}`);
+
+  ws.onopen = () => {
+    wsRetry = 0;
+    setConnStatus(true);
+  };
+  ws.onclose = () => {
+    setConnStatus(false);
+    const delay = Math.min(5000, 1000 * (wsRetry + 1));
+    wsRetry++;
+    setTimeout(connectWS, delay);
+  };
+  ws.onerror = () => setConnStatus(false);
+
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      handleWsMessage(msg);
+    } catch(err){}
+  };
+}
+
+function handleWsMessage(msg){
+  if(msg.type === 'ping') return;
+
+  if(msg.type === 'init' || msg.type === 'queue_update'){
+    jobs = {};
+    (msg.jobs || []).forEach(j => jobs[j.id] = j);
+    updateQueueBadge();
+    updateStats();
+    if(activeTab === 'queue') renderQueue();
+  }
+
+  if(msg.type === 'job_update'){
+    const j = msg.job;
+    jobs[j.id] = j;
+    updateQueueBadge();
+    updateStats();
+    if(activeTab === 'queue') updateJobCard(j);
+    // Notify on completion
+    if(j.status === 'completed' && !j._notified){
+      j._notified = true;
+      showNotif('✅ اكتمل التحميل: ' + (j.title || j.url), 'success');
+    }
+    if(j.status === 'failed'){
+      showNotif('❌ فشل التحميل: ' + (j.error || ''), 'error');
+    }
+  }
+
+  if(msg.type === 'progress'){
+    const j = jobs[msg.job_id];
+    if(j){
+      j.progress = msg.progress;
+      j.speed = msg.speed;
+      updateProgressEl(msg.job_id, msg.progress, msg.speed);
+    }
+  }
+}
+
+function setConnStatus(ok){
+  const dot = document.getElementById('connDot');
+  const label = document.getElementById('connLabel');
+  dot.className = 'conn-dot ' + (ok ? 'ok' : 'err');
+  label.textContent = ok ? 'متصل' : 'غير متصل';
+}
+
+/* ═══════════════════════════════════════════════════════
+   SINGLE DOWNLOAD
+   ═══════════════════════════════════════════════════════ */
+async function addSingleDownload(){
+  const url = document.getElementById('singleUrl').value.trim();
+  if(!url) return showNotif('الرجاء إدخال رابط', 'error');
+
+  const useTg = document.getElementById('singleTg').checked;
+  const body = {
+    url,
+    quality: selQuality,
+    send_to_telegram: useTg,
+  };
+  if(useTg){
+    body.telegram_token   = document.getElementById('singleTgToken').value.trim();
+    body.telegram_chat_id = document.getElementById('singleTgChat').value.trim();
+    if(!body.telegram_token || !body.telegram_chat_id){
+      return showNotif('أدخل توكن البوت وChat ID', 'error');
+    }
+  }
+
+  const btn = document.getElementById('singleBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> جاري الإضافة…';
+
+  try {
+    const res = await api('POST', '/api/download', body);
+    document.getElementById('singleUrl').value = '';
+    showNotif('✅ أُضيف للقائمة — Job #' + res.job_id, 'success');
+    // Switch to queue tab
+    setTimeout(() => switchTab('queue'), 600);
+  } catch(err){
+    showNotif('خطأ: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>⚡</span> تحميل';
+  }
+}
+
+document.getElementById('singleUrl').addEventListener('keydown', e => {
+  if(e.key === 'Enter') addSingleDownload();
+});
+
+function toggleSingleTgPanel(){
+  const panel = document.getElementById('singleTgPanel');
+  panel.style.display = document.getElementById('singleTg').checked ? 'block' : 'none';
+}
+
+/* ═══════════════════════════════════════════════════════
+   BULK DOWNLOAD
+   ═══════════════════════════════════════════════════════ */
+async function addBulkDownloads(){
+  const raw = document.getElementById('bulkUrls').value;
+  const urls = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  if(!urls.length) return showNotif('أدخل روابط أولاً', 'error');
+
+  const useTg = document.getElementById('bulkTg').checked;
+  const tgSettings = getSavedTgSettings();
+  const body = {
+    urls,
+    quality: bulkQuality,
+    send_to_telegram: useTg && !!tgSettings,
+    telegram_token: tgSettings?.token,
+    telegram_chat_id: tgSettings?.chat,
+  };
+
+  try {
+    const res = await api('POST', '/api/download/bulk', body);
+    showNotif(`✅ أُضيف ${res.count} رابط للقائمة`, 'success');
+    document.getElementById('bulkUrls').value = '';
+    document.getElementById('bulkCount').textContent = '0 رابط';
+    setTimeout(() => switchTab('queue'), 600);
+  } catch(err){
+    showNotif('خطأ: ' + err.message, 'error');
+  }
+}
+
+function clearBulk(){
+  document.getElementById('bulkUrls').value = '';
+  document.getElementById('bulkCount').textContent = '0 رابط';
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROFILE / CHANNEL FETCH
+   ═══════════════════════════════════════════════════════ */
+async function fetchProfile(){
+  const url = document.getElementById('profileUrl').value.trim();
+  if(!url) return showNotif('أدخل رابط الحساب', 'error');
+  const max = parseInt(document.getElementById('profileMax').value);
+
+  showNotif('⏳ جاري جلب فيديوهات الحساب…', 'info');
+
+  try {
+    const res = await api('POST', '/api/profile', {url, max_videos: max});
+    profileVideos = res.videos || [];
+    selectedVideoUrls.clear();
+    renderProfileGrid(res);
+  } catch(err){
+    showNotif('خطأ في الجلب: ' + err.message, 'error');
+  }
+}
+
+function renderProfileGrid(res){
+  const container = document.getElementById('profileResults');
+  container.style.display = 'block';
+  document.getElementById('profileTitle').textContent =
+    (res.videos[0]?.uploader || 'نتائج الحساب');
+  document.getElementById('profileSubtitle').textContent =
+    `${res.count} فيديو متاح`;
+
+  const grid = document.getElementById('profileGrid');
+  grid.innerHTML = '';
+
+  res.videos.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.dataset.url = v.url;
+    card.dataset.idx = i;
+
+    const dur = v.duration ? fmtDur(v.duration) : '';
+    const thumb = v.thumbnail
+      ? `<img class="video-thumb" src="${v.thumbnail}" loading="lazy" onerror="this.style.display='none'">`
+      : `<div class="video-thumb-placeholder">🎬</div>`;
+
+    card.innerHTML = `
+      <div class="check">✓</div>
+      ${thumb}
+      <div class="video-info">
+        <div class="video-title">${esc(v.title)}</div>
+        ${dur ? `<div class="video-dur">⏱ ${dur}</div>` : ''}
+      </div>`;
+
+    card.addEventListener('click', () => toggleVideoSelect(card, v.url));
+    grid.appendChild(card);
+  });
+
+  updateSelectedCount();
+}
+
+function toggleVideoSelect(card, url){
+  card.classList.toggle('selected');
+  if(card.classList.contains('selected')) selectedVideoUrls.add(url);
+  else selectedVideoUrls.delete(url);
+  updateSelectedCount();
+}
+
+function selectAllVideos(){
+  document.querySelectorAll('.video-card').forEach(card => {
+    card.classList.add('selected');
+    selectedVideoUrls.add(card.dataset.url);
+  });
+  updateSelectedCount();
+}
+
+function deselectAll(){
+  document.querySelectorAll('.video-card').forEach(c => c.classList.remove('selected'));
+  selectedVideoUrls.clear();
+  updateSelectedCount();
+}
+
+function updateSelectedCount(){
+  document.getElementById('selectedCount').textContent = `(${selectedVideoUrls.size})`;
+}
+
+async function downloadSelected(){
+  if(!selectedVideoUrls.size) return showNotif('اختر فيديوهات أولاً', 'error');
+  const urls = [...selectedVideoUrls];
+  const useTg = false; // Can be extended
+  try {
+    const res = await api('POST', '/api/download/bulk', {urls, quality: 'best'});
+    showNotif(`✅ أُضيف ${res.count} فيديو للقائمة`, 'success');
+    setTimeout(() => switchTab('queue'), 600);
+  } catch(err){
+    showNotif('خطأ: ' + err.message, 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   QUEUE RENDERING
+   ═══════════════════════════════════════════════════════ */
+function renderQueue(){
+  const list = document.getElementById('jobList');
+  const allJobs = Object.values(jobs);
+
+  if(!allJobs.length){
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📭</div>
+        <p>لا توجد مهام بعد<br/>أضف روابط للتحميل</p>
+      </div>`;
+    return;
+  }
+
+  // Sort: active first, then queued, then rest by time
+  allJobs.sort((a,b) => {
+    const order = {downloading:0, sending_telegram:1, queued:2, completed:3, failed:4, cancelled:5};
+    return (order[a.status]||9) - (order[b.status]||9) || b.created_at - a.created_at;
+  });
+
+  list.innerHTML = '';
+  allJobs.forEach(j => list.appendChild(buildJobCard(j)));
+}
+
+function buildJobCard(j){
+  const div = document.createElement('div');
+  div.className = `job-card status-${j.status}`;
+  div.id = `jc-${j.id}`;
+  div.innerHTML = jobCardHTML(j);
+  return div;
+}
+
+function updateJobCard(j){
+  const existing = document.getElementById(`jc-${j.id}`);
+  if(existing){
+    existing.className = `job-card status-${j.status}`;
+    existing.innerHTML = jobCardHTML(j);
+  } else {
+    if(activeTab === 'queue') renderQueue();
+  }
+}
+
+function updateProgressEl(jobId, pct, speed){
+  const fill = document.querySelector(`#jc-${jobId} .progress-fill`);
+  const label = document.querySelector(`#jc-${jobId} .progress-label`);
+  if(fill) fill.style.width = pct + '%';
+  if(label){
+    let txt = `${pct.toFixed(1)}%`;
+    if(speed) txt += ' — ' + fmtSpeed(speed);
+    label.textContent = txt;
+  }
+}
+
+function jobCardHTML(j){
+  const thumb = j.thumbnail
+    ? `<img class="job-thumb" src="${j.thumbnail}" loading="lazy" onerror="this.outerHTML='<div class=job-thumb-placeholder>🎬</div>'">`
+    : `<div class="job-thumb-placeholder">🎬</div>`;
+
+  const statusLabel = {
+    queued:'في الانتظار', downloading:'جاري التحميل',
+    completed:'مكتمل', failed:'فشل',
+    sending_telegram:'يُرسل لتيليجرام', cancelled:'ملغي'
+  }[j.status] || j.status;
+
+  let progressHTML = '';
+  if(j.status === 'downloading'){
+    progressHTML = `
+      <div class="progress-wrap">
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${j.progress||0}%"></div>
+        </div>
+        <div class="progress-label">${(j.progress||0).toFixed(1)}%${j.speed?' — '+fmtSpeed(j.speed):''}</div>
+      </div>`;
+  }
+
+  let actionsHTML = '';
+  if(j.status === 'completed'){
+    actionsHTML = `
+      <button class="btn btn-primary btn-sm" onclick="downloadFile('${j.id}')">⬇️ حفظ</button>
+      <button class="btn btn-purple btn-sm" onclick="sendToTg('${j.id}')" title="أرسل لتيليجرام">✈️</button>`;
+  }
+  if(j.status === 'queued'){
+    actionsHTML = `<button class="btn btn-danger btn-sm" onclick="cancelJob('${j.id}')">✕ إلغاء</button>`;
+  }
+
+  const filesize = j.filesize ? fmtSize(j.filesize) : '';
+  const platform = j.platform ? `<span style="font-size:10px;color:var(--cyan);">${j.platform}</span>` : '';
+  const tgBadge = j.telegram_sent ? '<span style="font-size:10px;color:#a78bfa;">✈️ أُرسل</span>' : '';
+  const errTip = j.status === 'failed'
+    ? `<div style="font-size:11px;color:var(--red);margin-top:4px;">${esc(j.error||'')}</div>` : '';
+
+  return `
+    ${thumb}
+    <div class="job-info">
+      <div class="job-title">${esc(j.title || j.url)}</div>
+      <div class="job-url">${esc(j.url)}</div>
+      <div class="job-meta">
+        <span class="status-pill ${j.status}">${statusLabel}</span>
+        ${platform}
+        ${filesize ? `<span style="font-size:10px;color:var(--text3);">${filesize}</span>` : ''}
+        ${tgBadge}
+      </div>
+      ${progressHTML}
+      ${errTip}
+    </div>
+    <div class="job-actions">${actionsHTML}</div>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   JOB ACTIONS
+   ═══════════════════════════════════════════════════════ */
+async function downloadFile(jobId){
+  window.open(`${API_BASE}/api/download/${jobId}/file`, '_blank');
+}
+
+async function cancelJob(jobId){
+  try {
+    await api('DELETE', `/api/queue/${jobId}`);
+    showNotif('تم الإلغاء', 'info');
+  } catch(err){ showNotif('خطأ: '+err.message,'error'); }
+}
+
+async function clearDone(){
+  try {
+    await api('DELETE', '/api/queue');
+    showNotif('تم حذف المكتملة', 'info');
+    await refreshQueue();
+  } catch(err){ showNotif('خطأ: '+err.message,'error'); }
+}
+
+async function refreshQueue(){
+  try {
+    const res = await api('GET', '/api/queue');
+    jobs = {};
+    (res.jobs || []).forEach(j => jobs[j.id] = j);
+    renderQueue();
+    updateStats();
+    updateQueueBadge();
+  } catch(err){}
+}
+
+async function sendToTg(jobId){
+  const s = getSavedTgSettings();
+  if(!s) return showNotif('احفظ إعدادات تيليجرام أولاً', 'error');
+  try {
+    await api('POST', '/api/telegram/send', {job_id:jobId, token:s.token, chat_id:s.chat});
+    showNotif('✅ تم الإرسال لتيليجرام', 'success');
+  } catch(err){
+    showNotif('خطأ تيليجرام: '+err.message, 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   STATS
+   ═══════════════════════════════════════════════════════ */
+function updateStats(){
+  const all = Object.values(jobs);
+  document.getElementById('s-total').textContent  = all.length;
+  document.getElementById('s-active').textContent = all.filter(j=>j.status==='downloading').length;
+  document.getElementById('s-done').textContent   = all.filter(j=>j.status==='completed').length;
+  document.getElementById('s-failed').textContent = all.filter(j=>j.status==='failed').length;
+}
+
+function updateQueueBadge(){
+  const pending = Object.values(jobs).filter(j=>['queued','downloading'].includes(j.status)).length;
+  const badge = document.getElementById('queueBadge');
+  if(pending > 0){
+    badge.style.display = 'inline-block';
+    badge.textContent = pending;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   TELEGRAM SETTINGS
+   ═══════════════════════════════════════════════════════ */
+function saveTgSettings(){
+  const token = document.getElementById('tgToken').value.trim();
+  const chat  = document.getElementById('tgChat').value.trim();
+  if(!token || !chat) return showNotif('أدخل التوكن والـ Chat ID','error');
+  localStorage.setItem('sahhab_tg', JSON.stringify({token,chat}));
+  showNotif('✅ تم حفظ إعدادات تيليجرام','success');
+}
+
+function getSavedTgSettings(){
+  try{ return JSON.parse(localStorage.getItem('sahhab_tg')); } catch{ return null; }
+}
+
+function loadSavedTgSettings(){
+  const s = getSavedTgSettings();
+  if(!s) return showNotif('لا توجد إعدادات محفوظة','error');
+  document.getElementById('singleTgToken').value = s.token;
+  document.getElementById('singleTgChat').value  = s.chat;
+  showNotif('تم تحميل الإعدادات','info');
+}
+
+async function verifyTelegram(){
+  const token = document.getElementById('tgToken').value.trim();
+  if(!token) return showNotif('أدخل التوكن أولاً','error');
+  const result = document.getElementById('tgVerifyResult');
+  result.innerHTML = '<div style="margin-top:10px;font-size:13px;color:var(--text3);">⏳ جاري التحقق…</div>';
+  try {
+    const res = await api('POST','/api/telegram/verify',{token});
+    result.innerHTML = `
+      <div class="tg-verified" style="margin-top:10px;">
+        <span class="icon">🤖</span>
+        <div>
+          <b>${res.bot_name}</b>
+          <div style="font-size:11px;color:var(--text2);">@${res.username} — التوكن صحيح!</div>
+        </div>
+      </div>`;
+  } catch(err){
+    result.innerHTML = `<div style="margin-top:10px;font-size:13px;color:var(--red);">❌ ${err.message}</div>`;
+  }
+}
+
+function toggleTokenVis(){
+  const inp = document.getElementById('tgToken');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+/* ═══════════════════════════════════════════════════════
+   NOTIFICATIONS
+   ═══════════════════════════════════════════════════════ */
+function showNotif(msg, type='info'){
+  const wrap = document.getElementById('notifications');
+  const el = document.createElement('div');
+  el.className = `notif ${type}`;
+  const icons = {success:'✅', error:'❌', info:'ℹ️'};
+  el.innerHTML = `<span>${icons[type]||'•'}</span><span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+/* ═══════════════════════════════════════════════════════
+   API HELPER
+   ═══════════════════════════════════════════════════════ */
+async function api(method, path, body){
+  const opts = {
+    method,
+    headers:{'Content-Type':'application/json'},
+  };
+  if(body) opts.body = JSON.stringify(body);
+  const res = await fetch(API_BASE + path, opts);
+  if(!res.ok){
+    let msg = `HTTP ${res.status}`;
+    try{ const d = await res.json(); msg = d.detail || msg; }catch{}
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
+/* ═══════════════════════════════════════════════════════
+   UTILS
+   ═══════════════════════════════════════════════════════ */
+function fmtDur(s){
+  s = Math.round(s);
+  const m = Math.floor(s/60), sec = s%60;
+  if(m >= 60){ const h = Math.floor(m/60); return `${h}:${String(m%60).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
+  return `${m}:${String(sec).padStart(2,'0')}`;
+}
+
+function fmtSpeed(bps){
+  if(!bps) return '';
+  if(bps >= 1024**2) return `${(bps/1024**2).toFixed(1)} MB/s`;
+  if(bps >= 1024) return `${(bps/1024).toFixed(0)} KB/s`;
+  return `${bps} B/s`;
+}
+
+function fmtSize(b){
+  if(b >= 1024**3) return `${(b/1024**3).toFixed(1)} GB`;
+  if(b >= 1024**2) return `${(b/1024**2).toFixed(1)} MB`;
+  if(b >= 1024)    return `${(b/1024).toFixed(0)} KB`;
+  return b + ' B';
+}
+
+function esc(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function switchTab(tab){
+  const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+  if(btn) btn.click();
+}
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════════ */
+// Load saved TG settings into telegram tab on page load
+window.addEventListener('load', () => {
+  const s = getSavedTgSettings();
+  if(s){
+    document.getElementById('tgToken').value = s.token;
+    document.getElementById('tgChat').value  = s.chat;
+  }
+  connectWS();
+  refreshQueue();
+});
+</script>
+</body>
+</html>
